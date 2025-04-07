@@ -85,6 +85,20 @@ function App() {
     }
   }, [gender, country, isLoading, url]);
 
+  const traerPorPais = useCallback(async () =>{
+    if (isLoading) return;
+    setIsLoading(true);
+    setLoadingType('doubeApiCall');
+    //setPeople({ axios: [], fetch: [] });
+    try{
+      console.log("hola");
+    }
+    catch(error){
+      console.log(error);
+    }
+    setIsLoading(false);
+  },country,isLoading, url);
+  //Arrow function
   const handleGender = (event) => setGender(event.target.value);
   const handleCountry = (event) => setCountry(event.target.value);
 
@@ -102,6 +116,10 @@ function App() {
         <button onClick={compareRequests} disabled={isLoading} className="btn">
           {isLoading && loadingType === 'compare' ? "Cargando..." : "Comparar Axios vs Fetch"}
         </button>
+        <button onClick={traerPorPais} disabled={isLoading} className="btn">
+          {isLoading && loadingType === 'doubleApiCall' ? "Cargando..." : "Funcionalidad adicional Pruebas"}
+        </button>
+        <input></input>
       </div>
       <VisualizarTiempos timeAxios={timeAxios} timeFetch={timeFetch} />
       <div className="App-results">
