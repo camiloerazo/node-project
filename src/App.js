@@ -13,6 +13,8 @@ function App() {
   const [country, setCountry] = useState('US');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingType, setLoadingType] = useState('');
+  const [inputCountry, setInputCountry] = useState(''); // New state for the input field
+  const [users, setUsers] = useState([]); // New state for fetched users
 
   const url = `https://randomuser.me/api/?results=12&gender=${gender}&nat=${country}`;
 
@@ -85,19 +87,24 @@ function App() {
     }
   }, [gender, country, isLoading, url]);
 
-  const traerPorPais = useCallback(async () =>{
+  const traerUsuariosOtraApi = useCallback(async () => {
     if (isLoading) return;
     setIsLoading(true);
-    setLoadingType('doubeApiCall');
-    //setPeople({ axios: [], fetch: [] });
-    try{
-      console.log("hola");
+    setLoadingType('doubleApiCall');
+    setUsers([]); // Clear previous users
+
+    try {
+        const response = await fetch(`https://dummyjson.com/users`);
+        if (!response.ok) throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
+        const data = await response.json();
+        setUsers(data.users); // Store the fetched users
+    } catch (error) {
+        console.error(`Error en traerPorPais: ${error.message}`);
+    } finally {
+        setTimeout(() => setIsLoading(false), 500);
     }
-    catch(error){
-      console.log(error);
-    }
-    setIsLoading(false);
-  },country,isLoading, url);
+}, [isLoading]);
+
   //Arrow function
   const handleGender = (event) => setGender(event.target.value);
   const handleCountry = (event) => setCountry(event.target.value);
@@ -116,10 +123,9 @@ function App() {
         <button onClick={compareRequests} disabled={isLoading} className="btn">
           {isLoading && loadingType === 'compare' ? "Cargando..." : "Comparar Axios vs Fetch"}
         </button>
-        <button onClick={traerPorPais} disabled={isLoading} className="btn">
-          {isLoading && loadingType === 'doubleApiCall' ? "Cargando..." : "Funcionalidad adicional Pruebas"}
+        <button onClick={traerUsuariosOtraApi} disabled={isLoading} className="btn">
+          {isLoading && loadingType === 'doubleApiCall' ? "Cargando..." : "Funcionalidad adicional Traer Usuarios otra API"}
         </button>
-        <input></input>
       </div>
       <VisualizarTiempos timeAxios={timeAxios} timeFetch={timeFetch} />
       <div className="App-results">
@@ -142,6 +148,25 @@ function App() {
               people.fetch.map(person => <Person key={person.login.uuid} person={person} />)
             ) : (
               !isLoading && <p>No hay resultados</p>
+            )}
+          </div>
+        </div>
+        <div className="result-section">
+          <h2>Usuarios Traídos por País</h2>
+          {isLoading && loadingType === 'doubleApiCall' && <p>Cargando datos...</p>}
+          <div className="people-grid">
+            {users.length > 0 ? (
+              users.map(user => (
+                <div key={user.id} className="user-card">
+                  <img src={user.image} alt={`${user.firstName} ${user.lastName}`} />
+                  <h3>{`${user.firstName} ${user.lastName}`}</h3>
+                  <p>Email: {user.email}</p>
+                  <p>Teléfono: {user.phone}</p>
+                  <p>País: {user.address.country}</p>
+                </div>
+              ))
+            ) : (
+              !isLoading && <p>No hay usuarios disponibles</p>
             )}
           </div>
         </div>
