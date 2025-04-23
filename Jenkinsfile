@@ -27,7 +27,7 @@ pipeline {
 
     stage('Checkout') {
       steps {
-        git url: 'https://github.com/guswill24/node-project.git', branch: 'main'
+        git url: 'https://github.com/camiloerazo/node-project.git', branch: 'main'
       }
     }
 
